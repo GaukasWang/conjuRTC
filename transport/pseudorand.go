@@ -2,7 +2,7 @@ package transport
 
 import "github.com/Gaukas/seed2sdp"
 
-// File: utils/seed2sdp.go
+// File: pseudorand.go
 // Package: utils
 // Author: Gaukas <i@gauk.as>
 // Description: Some helper functions to utilize package seed2sdp.
