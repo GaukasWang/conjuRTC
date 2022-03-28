@@ -50,7 +50,7 @@ func Mux2WebRTC(ctx context.Context, mux ice.UDPMux, seeds []string, clientSDPs 
 	dcConfig := transportc.DataChannelConfig{
 		Label:          "Conjure WebRTC Data Channel",
 		SelfSDPType:    "answer",
-		SendBufferSize: transportc.DataChannelBufferSizeDefault,
+		SendBufferSize: 0,
 	}
 
 	for i, clientSDP := range clientSDPs {

@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/Gaukas/seed2sdp v0.4.0
-	github.com/Gaukas/transportc v0.1.1
+	github.com/Gaukas/transportc v0.1.2
 	github.com/gin-gonic/gin v1.7.7
 	github.com/pion/ice/v2 v2.1.10
 	github.com/pion/webrtc/v3 v3.0.32

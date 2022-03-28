@@ -3,8 +3,8 @@ github.com/Gaukas/randutil_kai v0.2.0/go.mod h1:6ztIfwsKS2nFtRLVi1wFHDm1xQaFgOuV
 github.com/Gaukas/seed2sdp v0.3.6/go.mod h1:Zpp0s8lNahJsJOuAPBmttWy8r06iQ6Qirp4tNqGtBh8=
 github.com/Gaukas/seed2sdp v0.4.0 h1:wIPisjlcw0BvlylPJbFqZ4tcN0ryOF3FuKFEyfG3lmk=
 github.com/Gaukas/seed2sdp v0.4.0/go.mod h1:feQmFQN4/oXcMoEm4wxUS9Jug7gbOSleSuPTmK12Dd0=
-github.com/Gaukas/transportc v0.1.1 h1:Vao9vRtAwkT9DnXxfQLsmR7rw6zYm3JUmH+pp9MOyOA=
-github.com/Gaukas/transportc v0.1.1/go.mod h1:6BKW+/hKTZXbw92L9y5sMJzC6mKMehlvSYdaTp5bYxY=
+github.com/Gaukas/transportc v0.1.2 h1:O5QmZB3/Rho3l9HrAl03qrHxYxSiQEDiiWAPv1yPDAM=
+github.com/Gaukas/transportc v0.1.2/go.mod h1:6BKW+/hKTZXbw92L9y5sMJzC6mKMehlvSYdaTp5bYxY=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

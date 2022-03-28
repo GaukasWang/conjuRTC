@@ -19,3 +19,19 @@ func GetHKDFParamPair(seed string) (server, client *seed2sdp.HKDFParams) {
 
 	return server, client
 }
+
+func SetClientIdentifier(identifier string) {
+	clientIdentifier = identifier
+}
+
+func SetServerIdentifier(identifier string) {
+	serverIdentifier = identifier
+}
+
+func SetRandSalt(salt string) {
+	defaultRandSalt = salt
+}
+
+func RandPort(_ string) uint16 {
+	return 8943
+}
