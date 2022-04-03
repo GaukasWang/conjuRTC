@@ -51,6 +51,7 @@ func Mux2WebRTC(ctx context.Context, mux ice.UDPMux, seeds []string, clientSDPs 
 		Label:          "Conjure WebRTC Data Channel",
 		SelfSDPType:    "answer",
 		SendBufferSize: 0,
+		UDPMux:         mux,
 	}
 
 	for i, clientSDP := range clientSDPs {
@@ -83,11 +84,11 @@ func Mux2WebRTC(ctx context.Context, mux ice.UDPMux, seeds []string, clientSDPs 
 			Certificates: []webrtc.Certificate{
 				cert,
 			},
-			// ICEServers: []webrtc.ICEServer{
-			// 	{
-			// 		URLs: []string{"stun:stun.l.google.com:19302"},
-			// 	},
-			// },
+			ICEServers: []webrtc.ICEServer{
+				{
+					URLs: []string{"stun:stun.l.google.com:19302"},
+				},
+			},
 		}
 
 		go func() {
@@ -100,6 +101,10 @@ func Mux2WebRTC(ctx context.Context, mux ice.UDPMux, seeds []string, clientSDPs 
 			if err != nil {
 				return
 			}
+
+			// fmt.Println("===== Client SDP Estimated =====")
+			// fmt.Println(clientSDPstr)
+
 			conn.SetRemoteSDPJsonString(clientSDPstr)
 			_, err = conn.LocalSDP() // force answerer to generate local SDP
 			if err != nil {
@@ -113,18 +118,21 @@ func Mux2WebRTC(ctx context.Context, mux ice.UDPMux, seeds []string, clientSDPs 
 				time.Sleep(time.Millisecond * 5)
 
 				abandonedMutex.Lock()
-				defer abandonedMutex.Unlock()
 
 				// abandoned due to another candidate stands out - return
 				if abandoned {
 					conn.Close()
+					abandonedMutex.Unlock()
 					return
 				}
 
 				// Closed or Errored - return
 				if conn.Status()&transportc.WebRTConnClosed == 1 || conn.Status()&transportc.WebRTConnErrored == 1 {
+					abandonedMutex.Unlock()
 					return
 				}
+
+				abandonedMutex.Unlock()
 			}
 
 			// If it make it to here, it is ready. Signal all other goroutines to abandon

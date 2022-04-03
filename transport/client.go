@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"errors"
 	"net"
+	"time"
 
 	"github.com/Gaukas/seed2sdp"
 	"github.com/Gaukas/transportc"
@@ -90,14 +91,22 @@ func (c *Client) Prepare() error {
 	return err
 }
 
+// LocalSDP omits fingerprint, ice-ufrag, ice-pwd and other predictable fields
 func (c *Client) LocalSDP() (*seed2sdp.SDP, error) {
 	locapSdp, err := c.webRTConn.LocalSDPJsonString()
+	// fmt.Println("===== Client SDP ======")
+	// fmt.Println(locapSdp)
+
 	if err != nil {
 		return nil, err
 	}
 
 	sdp := seed2sdp.ParseSDP(locapSdp)
 	return &sdp, nil
+}
+
+func (c *Client) OriginalLocalSDP() (string, error) {
+	return c.webRTConn.LocalSDPJsonString()
 }
 
 // When building the UDP mux, add all phantoms' ICE candidate into one single SDP
@@ -157,29 +166,37 @@ func (c *Client) Connect(ctx context.Context, phantoms []*net.IP) (net.Conn, err
 		rtpCandidate.SetPort(RandPort(c.Seed()))
 		rtpCandidate.SetCandidateType(seed2sdp.Host) // Srflx?
 
-		rtcpCandidate := seed2sdp.ICECandidate{}
-		rtcpCandidate.SetComponent(seed2sdp.ICEComponentRTCP)
-		rtcpCandidate.SetProtocol(seed2sdp.UDP)
-		rtcpCandidate.SetIpAddr(*phantom)
-		rtcpCandidate.SetPort(RandPort(c.Seed()))
-		rtcpCandidate.SetCandidateType(seed2sdp.Host)
+		// rtcpCandidate := seed2sdp.ICECandidate{}
+		// rtcpCandidate.SetComponent(seed2sdp.ICEComponentRTCP)
+		// rtcpCandidate.SetProtocol(seed2sdp.UDP)
+		// rtcpCandidate.SetIpAddr(*phantom)
+		// rtcpCandidate.SetPort(RandPort(c.Seed()))
+		// rtcpCandidate.SetCandidateType(seed2sdp.Host)
 
-		serverSDP.IceCandidates = append(serverSDP.IceCandidates, rtpCandidate, rtcpCandidate)
+		serverSDP.IceCandidates = append(serverSDP.IceCandidates, rtpCandidate /*, rtcpCandidate */)
 	}
 
-	// Set the remote SDP
+	// // Set the remote SDP
+	// fmt.Println("===== Station SDP Estimated =====")
+	// fmt.Println(serverSDP.String())
+
 	err = c.webRTConn.SetRemoteSDPJsonString(serverSDP.String())
 	if err != nil {
 		return nil, err
 	}
 
 	// Block until conn is good to go
+	// fmt.Println("Block until good to go...")
 	for (c.webRTConn.Status() & transportc.WebRTConnReady) == 0 {
 		if ctx.Err() != nil {
 			return nil, ctx.Err()
+		} else if err = c.webRTConn.LastError(); err != nil {
+			return nil, err
 		}
+		time.Sleep(time.Millisecond * 10)
 	}
 
+	// fmt.Printf("Conn established... Status %d\n", c.webRTConn.Status())
 	// Read the first packet to make sure this connection is accepted by the station
 	buf := make([]byte, 8)
 	n := 0
@@ -188,12 +205,16 @@ func (c *Client) Connect(ctx context.Context, phantoms []*net.IP) (net.Conn, err
 			return nil, ctx.Err()
 		}
 		n, _ = c.webRTConn.Read(buf)
+		time.Sleep(time.Millisecond * 5)
 	}
-	if string(buf) == "WINNER" { // Accepted
+	// fmt.Println("Data packet received.")
+
+	if string(buf[:n]) == "WINNER" { // Accepted
 		return c.webRTConn, nil
-	} else if string(buf) == "RETRY" { // Rejected
+	} else if string(buf[:n]) == "RETRY" { // Rejected
 		return nil, errors.New("connection closed by station due to a socket conflict")
 	} else {
+		// fmt.Printf("Unexpected packet %s with length %d\n", string(buf), len(string(buf)))
 		return nil, errors.New("unexpected packet, maybe pipe is broken")
 	}
 }
