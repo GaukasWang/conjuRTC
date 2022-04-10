@@ -9,6 +9,7 @@ import (
 
 	"github.com/Gaukas/seed2sdp"
 	"github.com/Gaukas/transportc"
+	tdproto "github.com/GaukasWang/gotapdance/protobuf"
 	"github.com/pion/webrtc/v3"
 )
 
@@ -217,4 +218,32 @@ func (c *Client) Connect(ctx context.Context, phantoms []*net.IP) (net.Conn, err
 		// fmt.Printf("Unexpected packet %s with length %d\n", string(buf), len(string(buf)))
 		return nil, errors.New("unexpected packet, maybe pipe is broken")
 	}
+}
+
+func (c *Client) WebRTCSignal() (*tdproto.WebRTCSignal, error) {
+	seed := c.Seed()
+	sdp, err := c.LocalSDP()
+	if err != nil {
+		return nil, err
+	}
+	deflatedSDP := sdp.Deflate(nil)
+
+	sdpType := uint32(deflatedSDP.SDPType)
+	candidates := []*tdproto.WebRTCICECandidate{}
+	for _, defc := range deflatedSDP.Candidates {
+		cand := &tdproto.WebRTCICECandidate{
+			IpUpper:      &defc.IPUpper64,
+			IpLower:      &defc.IPLower64,
+			ComposedInfo: &defc.Composed32,
+		}
+		candidates = append(candidates, cand)
+	}
+
+	return &tdproto.WebRTCSignal{
+		Seed: &seed,
+		Sdp: &tdproto.WebRTCSDP{
+			Type:       &sdpType,
+			Candidates: candidates,
+		},
+	}, nil
 }
