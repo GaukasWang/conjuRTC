@@ -1,4 +1,4 @@
-package transport
+package conjurtc
 
 import (
 	"context"
@@ -9,8 +9,8 @@ import (
 
 	"github.com/Gaukas/seed2sdp"
 	"github.com/Gaukas/transportc"
-	tdproto "github.com/GaukasWang/gotapdance/protobuf"
 	"github.com/pion/webrtc/v3"
+	tdproto "github.com/refraction-networking/gotapdance/protobuf"
 )
 
 type Client struct {

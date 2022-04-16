@@ -1,4 +1,4 @@
-package transport
+package conjurtc
 
 import (
 	"context"

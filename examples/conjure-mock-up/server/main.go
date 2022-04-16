@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/Gaukas/seed2sdp"
-	"github.com/GaukasWang/conjuRTC/transport"
+	transport "github.com/GaukasWang/conjuRTC/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/pion/ice/v2"
 )

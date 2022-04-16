@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/GaukasWang/conjuRTC/transport"
+	transport "github.com/GaukasWang/conjuRTC/lib"
 	"golang.org/x/net/context"
 )
 
